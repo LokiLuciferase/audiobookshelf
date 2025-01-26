@@ -125,6 +125,7 @@ class ApiRouter {
     this.router.get('/items/:id/file/:fileid/download', LibraryItemController.middleware.bind(this), LibraryItemController.downloadLibraryFile.bind(this))
     this.router.get('/items/:id/ebook/:fileid?', LibraryItemController.middleware.bind(this), LibraryItemController.getEBookFile.bind(this))
     this.router.patch('/items/:id/ebook/:fileid/status', LibraryItemController.middleware.bind(this), LibraryItemController.updateEbookFileStatus.bind(this))
+    this.router.get('/items/:id/subtitles/segment', LibraryItemController.middleware.bind(this), LibraryItemController.getSubtitleSegment.bind(this))
 
     //
     // User Routes

@@ -143,6 +143,26 @@ class LibraryItemScanData {
     return this.libraryFiles.filter(lf => globals.SupportedEbookTypes.includes(lf.metadata.ext?.slice(1).toLowerCase() || ''))
   }
 
+  /** @type {LibraryFileModifiedObject[]} */
+  get audioSubtitleLibraryFilesModified() {
+    return this.libraryFilesModified.filter(lf => globals.SupportedAudioSubtitleTypes.includes(lf.old.metadata.ext?.slice(1).toLowerCase() || ''))
+  }
+
+  /** @type {LibraryItem.LibraryFileObject[]} */
+  get audioSubtitleLibraryFilesRemoved() {
+    return this.libraryFilesRemoved.filter(lf => globals.SupportedAudioSubtitleTypes.includes(lf.metadata.ext?.slice(1).toLowerCase() || ''))
+  }
+
+  /** @type {LibraryItem.LibraryFileObject[]} */
+  get audioSubtitleLibraryFilesAdded() {
+    return this.libraryFilesAdded.filter(lf => globals.SupportedAudioSubtitleTypes.includes(lf.metadata.ext?.slice(1).toLowerCase() || ''))
+  }
+
+  /** @type {LibraryItem.LibraryFileObject[]} */
+  get audioSubtitleLibraryFiles() {
+    return this.libraryFiles.filter(lf => globals.SupportedAudioSubtitleTypes.includes(lf.metadata.ext?.slice(1).toLowerCase() || ''))
+  }
+
   /** @type {LibraryItem.LibraryFileObject} */
   get descTxtLibraryFile() {
     return this.libraryFiles.find(lf => lf.metadata.filename === 'desc.txt')
@@ -174,8 +194,8 @@ class LibraryItemScanData {
   }
 
   /**
-   * 
-   * @param {LibraryItem} existingLibraryItem 
+   *
+   * @param {LibraryItem} existingLibraryItem
    * @param {import('./LibraryScan')} libraryScan
    * @returns {boolean} true if changes found
    */
@@ -283,8 +303,8 @@ class LibraryItemScanData {
   /**
    * Update existing library file with scanned in library file data
    * @param {string} libraryItemPath
-   * @param {LibraryItem.LibraryFileObject} existingLibraryFile 
-   * @param {import('../objects/files/LibraryFile')} scannedLibraryFile 
+   * @param {LibraryItem.LibraryFileObject} existingLibraryFile
+   * @param {import('../objects/files/LibraryFile')} scannedLibraryFile
    * @param {import('./LibraryScan')} libraryScan
    * @returns {boolean} false if no changes
    */
@@ -317,7 +337,7 @@ class LibraryItemScanData {
 
   /**
    * Check if existing audio file on Book was removed
-   * @param {import('../models/Book').AudioFileObject} existingAudioFile 
+   * @param {import('../models/Book').AudioFileObject} existingAudioFile
    * @returns {boolean} true if audio file was removed
    */
   checkAudioFileRemoved(existingAudioFile) {
@@ -332,7 +352,7 @@ class LibraryItemScanData {
 
   /**
    * Check if existing ebook file on Book was removed
-   * @param {import('../models/Book').EBookFileObject} ebookFile 
+   * @param {import('../models/Book').EBookFileObject} ebookFile
    * @returns {boolean} true if ebook file was removed
    */
   checkEbookFileRemoved(ebookFile) {
@@ -347,8 +367,8 @@ class LibraryItemScanData {
 
   /**
    * Set data parsed from filenames
-   * 
-   * @param {Object} bookMetadata 
+   *
+   * @param {Object} bookMetadata
    */
   setBookMetadataFromFilenames(bookMetadata) {
     const keysToMap = ['title', 'subtitle', 'publishedYear', 'asin']

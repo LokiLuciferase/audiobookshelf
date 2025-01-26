@@ -42,6 +42,7 @@ class LibraryFile {
   get fileType() {
     if (globals.SupportedImageTypes.includes(this.metadata.format)) return 'image'
     if (globals.SupportedAudioTypes.includes(this.metadata.format)) return 'audio'
+    if (globals.SupportedAudioSubtitleTypes.includes(this.metadata.format)) return 'subtitles'
     if (globals.SupportedEbookTypes.includes(this.metadata.format)) return 'ebook'
     if (globals.TextFileTypes.includes(this.metadata.format)) return 'text'
     if (globals.MetadataFileTypes.includes(this.metadata.format)) return 'metadata'

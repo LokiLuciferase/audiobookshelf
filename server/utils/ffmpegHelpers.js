@@ -5,6 +5,7 @@ const fs = require('../libs/fsExtra')
 const Path = require('path')
 const Logger = require('../Logger')
 const { filePathToPOSIX, copyToExisting } = require('./fileUtils')
+const { parseSRTString } = require('./parsers/parseSRT')
 
 function escapeSingleQuotes(path) {
   // A ' within a quoted string is escaped with '\'' in ffmpeg (see https://www.ffmpeg.org/ffmpeg-utils.html#Quoting-and-escaping)
@@ -493,3 +494,32 @@ async function mergeAudioFiles(audioTracks, duration, itemCachePath, outputFileP
 }
 
 module.exports.mergeAudioFiles = mergeAudioFiles
+
+/**
+ * Retrieves a segment from an SRT subtitle file based on the passed start and duration.
+ *
+ * @param {import('../models/Book').SubtitleFileObject} subtitleFile - the subtitle file to retrieve segments from.
+ * @param {string} start - The start index.
+ * @param {string} stop - The end index.
+ * @param {import('../libs/fluentFfmpeg/index').FfmpegCommand} [ffmpeg=Ffmpeg()] - The FFmpeg instance to use for merging.
+ * @returns {Promise<object>} A promise that resolves when the processing is done, containing the string cut from the SRT file.
+ */
+async function getSrtSegments(subtitleFile, start, stop, ffmpeg = Ffmpeg()) {
+  ffmpeg.input(subtitleFile.metadata.path)
+  ffmpeg.outputOptions(['-f srt'])
+  ffmpeg.outputOptions([`-ss ${start}`, `-to ${stop}`])
+  ffmpeg.output('-')
+  return new Promise((resolve, reject) => {
+    ffmpeg.on('start', (cmdline) => console.log(cmdline))
+    ffmpeg.on('end', async (stdout, stderr) => {
+      resolve(parseSRTString(stdout))
+    })
+    ffmpeg.on('error', async(err, stdout, stderr) => {
+      reject(err)
+    })
+
+    ffmpeg.run()
+  })
+}
+
+module.exports.getSrtSegments = getSrtSegments

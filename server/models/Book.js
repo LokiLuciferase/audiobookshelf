@@ -72,6 +72,14 @@ const htmlSanitizer = require('../utils/htmlSanitizer')
  * @typedef {AudioFileObject & AudioTrackProperties} AudioTrack
  */
 
+/**
+ * @typedef AudioSubtitleFileObject
+ * @property {number} index
+ * @property {string} ino
+ * @property {{filename:string, ext:string, path:string, relPath:string, size:number, mtimeMs:number, ctimeMs:number, birthtimeMs:number}} metadata
+ * @property {string} format
+ */
+
 class Book extends Model {
   constructor(values, options) {
     super(values, options)
@@ -110,6 +118,8 @@ class Book extends Model {
     this.narrators
     /** @type {AudioFileObject[]} */
     this.audioFiles
+    /** @type {AudioSubtitleFileObject} */
+    this.audioSubtitleFile
     /** @type {EBookFileObject} */
     this.ebookFile
     /** @type {ChapterObject[]} */
@@ -161,6 +171,7 @@ class Book extends Model {
         narrators: DataTypes.JSON,
         audioFiles: DataTypes.JSON,
         ebookFile: DataTypes.JSON,
+        audioSubtitleFile: DataTypes.JSON,
         chapters: DataTypes.JSON,
         tags: DataTypes.JSON,
         genres: DataTypes.JSON
@@ -255,6 +266,10 @@ class Book extends Model {
     return !!this.hasAudioTracks || !!this.ebookFile
   }
 
+  get hasAudioSubtitleFile() {
+    return !!this.audioSubtitleFile.ino
+  }
+
   get hasAudioTracks() {
     return !!this.includedAudioFiles.length
   }
@@ -322,6 +337,9 @@ class Book extends Model {
     this.audioFiles.forEach((af) => (total += af.metadata.size))
     if (this.ebookFile) {
       total += this.ebookFile.metadata.size
+    }
+    if (this.audioSubtitleFile) {
+      total += this.audioSubtitleFile.metadata.size
     }
     return total
   }
@@ -411,6 +429,12 @@ class Book extends Model {
     if (payload.ebookFile && JSON.stringify(this.ebookFile) !== JSON.stringify(payload.ebookFile)) {
       this.ebookFile = payload.ebookFile
       this.changed('ebookFile', true)
+      hasUpdates = true
+    }
+
+    if (payload.audioSubtitleFile && JSON.stringify(this.audioSubtitleFile) !== JSON.stringify(payload.audioSubtitleFile)) {
+      this.audioSubtitleFile = payload.audioSubtitleFile
+      this.changed('audioSubtitleFile', true)
       hasUpdates = true
     }
 
@@ -609,6 +633,7 @@ class Book extends Model {
       coverPath: this.coverPath,
       tags: [...(this.tags || [])],
       audioFiles: structuredClone(this.audioFiles),
+      audioSubtitleFile: structuredClone(this.audioSubtitleFile),
       chapters: structuredClone(this.chapters),
       ebookFile: structuredClone(this.ebookFile)
     }
@@ -654,6 +679,7 @@ class Book extends Model {
       coverPath: this.coverPath,
       tags: [...(this.tags || [])],
       audioFiles: structuredClone(this.audioFiles),
+      audioSubtitleFile: structuredClone(this.audioSubtitleFile),
       chapters: structuredClone(this.chapters),
       ebookFile: structuredClone(this.ebookFile),
       duration: this.duration,

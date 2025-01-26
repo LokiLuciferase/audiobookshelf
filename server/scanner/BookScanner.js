@@ -205,6 +205,13 @@ class BookScanner {
       hasMediaChanges = true
     }
 
+    if (!media.audioSubtitleFile && !librarySettings.audiobooksOnly && libraryItemData.audioSubtitleLibraryFiles.length) {
+      let audioSubtitleFile = libraryItemData.audioSubtitleLibraryFiles[0]
+      media.audioSubtitleFile = audioSubtitleFile
+      media.changed('audioSubtitleFile', true)
+      hasMediaChanges = true
+    }
+
     const ebookFileScanData = await parseEbookMetadata.parse(media.ebookFile)
 
     const bookMetadata = await this.getBookMetadataFromScanData(media.audioFiles, ebookFileScanData, libraryItemData, libraryScan, librarySettings, existingLibraryItem.id)
@@ -448,6 +455,9 @@ class BookScanner {
     // Find ebook file (prefer epub)
     let ebookLibraryFile = librarySettings.audiobooksOnly ? null : libraryItemData.ebookLibraryFiles.find((lf) => lf.metadata.ext.slice(1).toLowerCase() === 'epub') || libraryItemData.ebookLibraryFiles[0]
 
+    // Find subtitle file (srt)
+    let audioSubtitleFile = librarySettings.audiobooksOnly ? null : libraryItemData.audioSubtitleFiles? libraryItemData.audioSubtitleFiles[0]: null
+
     // Do not add library items that have no valid audio files and no ebook file
     if (!ebookLibraryFile && !scannedAudioFiles.length) {
       libraryScan.addLog(LogLevel.WARN, `Library item at path "${libraryItemData.relPath}" has no audio files and no ebook file - ignoring`)
@@ -471,6 +481,7 @@ class BookScanner {
       ...bookMetadata,
       audioFiles: scannedAudioFiles,
       ebookFile: ebookLibraryFile || null,
+      audioSubtitleFile: audioSubtitleFile || null,
       duration,
       bookAuthors: [],
       bookSeries: []

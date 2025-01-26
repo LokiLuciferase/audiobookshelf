@@ -10,6 +10,7 @@ const zipHelpers = require('../utils/zipHelpers')
 const { reqSupportsWebp } = require('../utils/index')
 const { ScanResult, AudioMimeType } = require('../utils/constants')
 const { getAudioMimeTypeFromExtname, encodeUriPath } = require('../utils/fileUtils')
+const { getSrtSegments } = require('../utils/ffmpegHelpers')
 const LibraryItemScanner = require('../scanner/LibraryItemScanner')
 const AudioFileScanner = require('../scanner/AudioFileScanner')
 const Scanner = require('../scanner/Scanner')
@@ -1052,6 +1053,22 @@ class LibraryItemController {
     } catch (error) {
       Logger.error(`[LibraryItemController] Failed to download file "${libraryFile.metadata.path}"`, error)
       LibraryItemController.handleDownloadError(error, res)
+    }
+  }
+
+  /**
+   * GET api/items/:id/subtitles/segment
+   *
+   * @param {LibraryItemControllerRequestWithFile} req
+   * @param {Response} res
+   */
+  async getSubtitleSegment(req, res) {
+    let subtitleFile = req.libraryItem.media.audioSubtitleFile
+    try {
+      let segmentsStr = await getSrtSegments(subtitleFile, req.query.start, req.query.end)
+      res.json(segmentsStr)
+    } catch (error) {
+      Logger.error(error)
     }
   }
 
